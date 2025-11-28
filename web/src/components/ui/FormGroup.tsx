@@ -10,6 +10,7 @@ const formGroupVariants = tv({
 interface FormGroupProps extends ComponentProps<typeof Input> {
     label: string;
     errorMessage?: string;
+    prefix?: string;
 }
 
 export function FormGroup({
@@ -17,16 +18,17 @@ export function FormGroup({
     errorMessage,
     status,
     className,
+    prefix,
     ...inputProps
 }: FormGroupProps) {
 
     const currentStatus = errorMessage ? 'error' : (status || 'default');
 
     const titleClasses = tv({
-        base: 'text-sm font-semibold uppercase tracking-wider',
+        base: 'text-md font-semibold uppercase tracking-wider',
         variants: {
             status: {
-                default: 'text-gray-600',
+                default: 'text-gray-400',
                 active: 'text-primary',
                 error: 'text-danger',
             }
@@ -43,10 +45,19 @@ export function FormGroup({
                 {label}
             </label>
 
-            <Input
-                status={currentStatus}
-                {...inputProps}
-            />
+            <div className="relative flex items-center">
+                {prefix && (
+                    <span className="absolute left-4 text-gray-400 pointer-events-none select-none z-10 text-md">
+                        {prefix}
+                    </span>
+                )}
+
+                <Input
+                    status={currentStatus}
+                    {...inputProps}
+                    className={prefix ? "pl-[4rem]" : ""}
+                />
+            </div>
 
             {errorMessage && (
                 <div className="flex items-center gap-1 mt-1 text-danger text-md font-semibold">
