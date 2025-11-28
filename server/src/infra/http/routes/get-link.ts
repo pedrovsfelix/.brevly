@@ -3,7 +3,7 @@ import { unwrapEither } from "@/shared/either";
 import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import z from "zod";
 
-export const createLinkRoute: FastifyPluginAsyncZod = async server => {
+export const getLinkRoute: FastifyPluginAsyncZod = async server => {
 	await server.get(
 		"/links",
 		{
