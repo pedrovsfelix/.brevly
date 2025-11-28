@@ -1,4 +1,5 @@
-import { CreateLink } from "../../components/links/CreateLink";
+
+import { CreateLink } from "../../components/links/CreateLink/CreateLink";
 import { LinksWrapper } from "../../components/links/LinksWrapper";
 
 export function Home() {
