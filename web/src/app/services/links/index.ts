@@ -4,7 +4,7 @@ import { getAll } from "./getAll";
 import { getId } from "./getId";
 import { remove } from "./remove";
 
-export const productsService = {
+export const linkService = {
   create,
   getAll,
   getId,
