@@ -19,7 +19,12 @@ export const createLinkRoute: FastifyPluginAsyncZod = async server => {
           }),
         }),
         response: {
-          201: z.object({ id: z.string().uuid() }),
+          201: z.object({ 
+            id: z.string().uuid(),
+            originalUrl: z.string(),
+            shortUrl: z.string(),
+            createdAt: z.string().or(z.date()).optional(),
+          }),
           400: z.object({ message: z.string() }),
           409: z.object({ message: z.string() }),
         },
