@@ -7,23 +7,23 @@ import { LinkAlreadyExistsError } from "./errors/link-already-exists";
 
 const createLinkInput = z.object({
     originalUrl: z.string().url(),
-    shortUrl: z.string().regex(/^[a-z0-9-]+$/, {
-        message:
-            "Não deve ser possível criar um link com URL encurtada mal formatada",
-    }),
+    shortUrl: z.string().regex(/^[a-z0-9-]+$/),
 });
 
 type CreateLinkInput = z.input<typeof createLinkInput>;
 
-type CreateLinkOutput = {
-    id: string;
-};
+type CreateLinkOutput = typeof schema.links.$inferSelect; 
 
 export async function createLink(
     input: CreateLinkInput,
 ): Promise<Either<InvalidShortUrl | LinkAlreadyExistsError, CreateLinkOutput>> {
-    
-    const { originalUrl, shortUrl } = createLinkInput.parse(input);
+
+    const parseResult = createLinkInput.safeParse(input);
+    if (!parseResult.success) {
+        return makeLeft(new InvalidShortUrl());
+    }
+
+    const { originalUrl, shortUrl } = parseResult.data;
 
     const existingShortLink = await db.query.links.findFirst({
         where: (links, { eq }) => eq(links.shortUrl, shortUrl),
@@ -41,7 +41,5 @@ export async function createLink(
         })
         .returning();
 
-    return makeRight({
-        id: link[0].id,
-    });
+    return makeRight(link[0]);
 }
