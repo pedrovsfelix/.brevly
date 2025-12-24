@@ -1,13 +1,13 @@
 import { CheckIcon, CopyIcon, TrashIcon } from "@phosphor-icons/react";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import type { Link } from "../../app/entities/Link";
-import { remove } from "../../app/services/links/remove";
-import { Button } from "../ui/Button";
+import type { Link } from "../../../../app/entities/Link";
+import { remove } from "../../../../app/services/links/remove";
+import { Button } from "../../../ui/Button";
 
 interface ShortenedLinkItemProps {
     link: Link;
-    onDelete: (id: string) => void;
+    onDelete: () => void;
 }
 
 export function ShortenedLinkItem({ link, onDelete }: ShortenedLinkItemProps) {
@@ -18,7 +18,7 @@ export function ShortenedLinkItem({ link, onDelete }: ShortenedLinkItemProps) {
     const cleanBaseUrl = baseUrl.replace(/\/$/, "");
     const fullUrl = `${cleanBaseUrl}/${link.shortUrl}`;
 
-    const shortUrl = `brev.ly/${link.shortUrl}`;
+    const shortUrlDisplay = `brev.ly/${link.shortUrl}`;
 
     function handleCopy() {
         navigator.clipboard.writeText(fullUrl);
@@ -27,16 +27,18 @@ export function ShortenedLinkItem({ link, onDelete }: ShortenedLinkItemProps) {
     }
 
     async function handleDelete() {
-
         const confirmDelete = window.confirm("Tem certeza que deseja excluir este link?");
 
         if (!confirmDelete) return;
 
         try {
             setIsDeleting(true);
+
             await remove(link.id);
+
             toast.success("Link excluído com sucesso!");
-            onDelete(link.id);
+
+            onDelete();
 
         } catch (error) {
             console.error(error);
@@ -47,7 +49,7 @@ export function ShortenedLinkItem({ link, onDelete }: ShortenedLinkItemProps) {
     }
 
     return (
-        <div className="border-b border-gray-200 flex justify-between items-center py-4 gap-5 md:w-[580px]">
+        <div className="border-b border-gray-200 flex justify-between items-center py-4 gap-5">
             <div className="flex flex-col gap-1 w-[157px] md:w-[347px]">
                 <a
                     href={fullUrl}
@@ -55,7 +57,7 @@ export function ShortenedLinkItem({ link, onDelete }: ShortenedLinkItemProps) {
                     rel="noopener noreferrer"
                     className="text-primary text-md font-bold hover:underline truncate"
                 >
-                    {shortUrl}
+                    {shortUrlDisplay}
                 </a>
                 <p className="text-gray-500 text-sm truncate" title={link.originalUrl}>
                     {link.originalUrl}
