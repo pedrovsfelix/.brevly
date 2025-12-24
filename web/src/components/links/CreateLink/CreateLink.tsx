@@ -1,20 +1,25 @@
-
+import type { Link } from "../../../app/entities/Link";
 import { Button } from "../../ui/Button";
 import { FormGroup } from "../../ui/FormGroup";
 import { useCreateLinkController } from "./useCreateLinkController";
 
-export function CreateLink() {
+interface CreateLinkProps {
+    onLinkCreated: (link: Link) => void;
+}
+
+export function CreateLink({ onLinkCreated }: CreateLinkProps) {
+
     const {
         handleSubmit,
         register,
         errors,
         isSubmitting
-    } = useCreateLinkController();
+    } = useCreateLinkController({ onSuccess: onLinkCreated });
 
     return (
         <form
             onSubmit={handleSubmit}
-            className="flex flex-col p-5 lg:p-8 rounded-lg gap-6 bg-white w-[380px]"
+            className="flex flex-col p-6 rounded-lg gap-6 bg-white w-full lg:w-[380px]"
         >
             <h2 className="scroll-m-20 text-gray-600 pb-2 text-lg font-bold tracking-tight">
                 Novo link
