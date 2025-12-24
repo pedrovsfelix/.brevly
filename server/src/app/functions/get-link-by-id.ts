@@ -1,27 +1,35 @@
 import { db } from "@/infra/db";
 import { schema } from "@/infra/db/schemas";
 import { type Either, makeLeft, makeRight } from "@/shared/either";
-import { sql } from "drizzle-orm";
+
+import { or, sql } from "drizzle-orm";
 import z from "zod";
 import { InvalidLink } from "./errors/invalid-link";
 
-const getLinkBySlugInput = z.object({
-    shortUrl: z.string(),
+const getLinkByIdInput = z.object({
+    id: z.string(),
 });
 
-type GetLinkBySlugInput = z.input<typeof getLinkBySlugInput>;
+type GetLinkByIdInput = z.input<typeof getLinkByIdInput>;
 
-type GetLinkBySlugOutput = {
+type GetLinkByIdOutput = {
+    id: string;
     originalUrl: string;
+    shortUrl: string;
+    accessClick: number;
+    createdAt: string;
 };
 
 export async function getLinkById(
-    input: GetLinkBySlugInput,
-): Promise<Either<InvalidLink, GetLinkBySlugOutput>> {
-    const { shortUrl } = getLinkBySlugInput.parse(input);
+    input: GetLinkByIdInput,
+): Promise<Either<InvalidLink, GetLinkByIdOutput>> {
+    const { id } = getLinkByIdInput.parse(input);
 
     const link = await db.query.links.findFirst({
-        where: (links, { eq }) => eq(links.shortUrl, shortUrl),
+        where: (links, { eq }) => or(
+            eq(links.id, id),
+            eq(links.shortUrl, id)
+        ),
     });
 
     if (!link) {
@@ -36,6 +44,10 @@ export async function getLinkById(
         .where(sql`${schema.links.id} = ${link.id}`);
 
     return makeRight({
+        id: link.id,
         originalUrl: link.originalUrl,
+        shortUrl: link.shortUrl,
+        accessClick: link.accessClick + 1,
+        createdAt: link.createdAt.toISOString(),
     });
 }
