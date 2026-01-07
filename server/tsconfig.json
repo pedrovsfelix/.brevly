@@ -8,6 +8,9 @@
     "module": "ESNext",
     "target": "ESNext",
 
+    "outDir": "dist",
+    "rootDir": "src",
+
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -16,5 +19,13 @@
     "paths": {
       "@/*": ["./src/*"]
     }
-  }
+  },
+  
+  "include": ["src/**/*.ts"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "drizzle.config.ts",
+    "**/*.test.ts"
+  ]
 }
