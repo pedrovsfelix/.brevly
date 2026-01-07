@@ -1,30 +1,21 @@
-FROM node:22 AS base
-
-RUN npm i -g pnpm
-
-FROM base AS dependencies
-
+FROM node:22-alpine AS base
 WORKDIR /usr/src/app
+RUN corepack enable
 
-COPY package.json pnpm-lock.yaml ./
-
-RUN pnpm install
+FROM base AS deps
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
 
 FROM base AS build
-
-WORKDIR /usr/src/app
-
 COPY . .
-COPY --from=dependencies /usr/src/app/node_modules ./node_modules
+COPY --from=deps /usr/src/app/node_modules ./node_modules
 
-RUN npm install -g pnpm
-RUN pnpm build
-RUN pnpm prune --prod
+RUN yarn build
+RUN yarn install --production --ignore-scripts --prefer-offline
 
-FROM node:22 AS deploy
+FROM node:22-alpine AS deploy
 
-USER 1000
-
+USER node
 WORKDIR /usr/src/app
 
 COPY --from=build /usr/src/app/dist ./dist
@@ -33,4 +24,4 @@ COPY --from=build /usr/src/app/package.json ./package.json
 
 EXPOSE 3333
 
-CMD [ "node", "dist/http/server.js" ]
+CMD ["node", "dist/server.js"]
